@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: update-git-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: update-git
+  template:
+    metadata:
+      labels:
+        app: update-git
+    spec:
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+      - command:
+        - bash
+        args:
+        - -c
+        - |
+          set -e
+
+          nsenter --target 1 --mount bash -c '
+          
+          cd /firm
+          git pull origin main
+          echo SUCCESS
+          
+          '
+        image: python:3.11.2-bullseye
+        name: update-git
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /mnt
+          name: nodefs
+      volumes:
+      - hostPath:
+          path: /
+        name: nodefs
+      containers:
+      - name: wait
+        image: k8s.gcr.io/pause:3.1

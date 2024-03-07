@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prepare-anorminj-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: prepare-anorminj
+  template:
+    metadata:
+      labels:
+        app: prepare-anorminj
+    spec:
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+      - command:
+        - bash
+        args:
+        - -c
+        - |
+          set -e
+
+          nsenter --target 1 --mount bash -c '
+          
+          cd /firm
+          cd anomaly-injector
+          mkdir test-files
+          cd test-files
+          sysbench fileio --file-total-size=150G prepare
+
+          echo SUCCESS
+          
+          '
+        image: python:3.11.2-bullseye
+        name: prepare-anorminj
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /mnt
+          name: nodefs
+      volumes:
+      - hostPath:
+          path: /
+        name: nodefs
+      containers:
+      - name: wait
+        image: k8s.gcr.io/pause:3.1

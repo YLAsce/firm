@@ -6,14 +6,14 @@ import h5py
 
 # configure node IP addresses, username, network dev, and location of the performance anomaly injector here
 nodes = [
-        '10.1.0.11', '10.1.0.12', '10.1.0.13', '10.1.0.14',
-        '10.1.0.21', '10.1.0.22', '10.1.0.23', '10.1.0.24',
-        '10.1.0.200', '10.1.0.201',
-        '10.1.0.203', '10.1.0.204', '10.1.0.205', '10.1.0.206'
+        '2rbdv', '4fz2l', '6476q', '68jdm',
+        '6lrzk', 'bbjdc', 'bqjnx', 'dhhw9',
+        'dqp8z', 'dxxdd',
+        'htcd2', 'sz29g', 'v9f87', 'x4prz', 'z594x'
 ]
-username = 'ubuntu'
-password = ''
-location = '~/firm/src/anomaly-injector/'
+#username = 'ubuntu'
+#password = ''
+location = '/firm/anomaly-injector/'
 
 train_file_name = 'svm_train.h5'
 test_file_name = 'svm_test.h5'

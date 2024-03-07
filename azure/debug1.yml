@@ -12,7 +12,9 @@ spec:
     - -c
     - |
       set -e
-      sleep 70000
+      while true; do
+        sleep 50000
+      done
       # Enter the node filesystem with
       # k exec -ti install-1 -- bash
       # nsenter --target 1 --mount
