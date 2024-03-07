@@ -1,0 +1,55 @@
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: kafka-connect
+  labels:
+    monitoredBy: prometheus
+spec:
+  version: 2.4.0
+  replicas: 1
+  image: razalgethi/trace-grapher-strimzi-kafka-connect
+  bootstrapServers: kafka-cluster-kafka-bootstrap.monitoring-stack.svc.cluster.local:9092
+  config:
+    group.id: kafka-connect-group
+    config.storage.replication.factor: 1
+    offset.storage.replication.factor: 1
+    status.storage.replication.factor: 1
+    key.converter.schemas.enable: false
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: false
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    internal.key.converter: org.apache.kafka.connect.json.JsonConverter
+    internal.value.converter: org.apache.kafka.connect.json.JsonConverter
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 2
+    requests:
+      memory: 1Gi
+      cpu: 500m
+  jvmOptions:
+    "-Xmx": 256M
+    "-Xms": 256M
+  logging:
+    type: inline
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        key: kafka-connect-connect-jmx-exporter-configuration.yaml
+        name: kafka-connect-connect-jmx-exporter-configuration
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-connect-connect-jmx-exporter-configuration
+data:
+  kafka-connect-connect-jmx-exporter-configuration.yaml: |
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    rules:
+    - pattern: "kafka.connect<type=connect-worker-metrics>([^:]+):"
+      name: "kafka_connect_connect_worker_metrics_$1"
+    - pattern: "kafka.connect<type=connect-metrics, client-id=([^:]+)><>([^:]+)"
+      name: "kafka_connect_connect_metrics_$1_$2"

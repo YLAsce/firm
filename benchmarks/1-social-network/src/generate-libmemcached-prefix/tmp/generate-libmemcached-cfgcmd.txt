@@ -1,0 +1,1 @@
+cmd='/Users/mayuqiang/Desktop/M2 thesis/code/firm/benchmarks/1-social-network/downloads/libmemcached/configure;--prefix=;LDFLAGS=-L'
