@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: prepare-anorminj-daemonset
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
@@ -25,9 +26,10 @@ spec:
           
           cd /firm
           cd anomaly-injector
-          mkdir test-files
-          cd test-files
-          sysbench fileio --file-total-size=150G prepare
+          rm -rf test-files
+          #mkdir test-files
+          #cd test-files
+          #sysbench fileio --file-total-size=50G prepare
 
           echo SUCCESS
           

@@ -23,9 +23,17 @@ spec:
 
           nsenter --target 1 --mount bash -c '
           
-          cd /firm
-          git pull origin main
-          echo SUCCESS
+          if [ -d "/home/azureuser/firm" ]; then
+              cd /home/azureuser/firm
+              git pull origin main
+              echo --UPDATED--
+          else
+              cd /home/azureuser
+              git clone https://github.com/YLAsce/firm.git
+              echo --CLONED--
+          fi
+          
+          
           
           '
         image: python:3.11.2-bullseye

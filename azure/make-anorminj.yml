@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: install-env-daemonset
+  name: install-anorminj-daemonset
 spec:
   selector:
     matchLabels:
@@ -23,14 +23,7 @@ spec:
 
           nsenter --target 1 --mount bash -c '
           
-          if [ -d "firm" ]; then
-            rm -rf "firm"
-          fi
-
-          git clone https://gitlab.engr.illinois.edu/DEPEND/firm.git
-          cd firm
-          sed -i '\''s/==/ #==/g'\'' requirements.txt
-          sed -i '\''s/grpc #==1.0.0/#grpc #==1.0.0/g'\'' requirements.txt
+          cd /home/azureuser/firm
           sed -i "/#\$nrconf{restart} = '\''i'\'';/s/.*/\$nrconf{restart} = '\''a'\'';/" /etc/needrestart/needrestart.conf
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3 get-pip.py
@@ -51,7 +44,7 @@ spec:
           
           '
         image: python:3.11.2-bullseye
-        name: init-node
+        name: install-anorminj
         securityContext:
           privileged: true
         volumeMounts:
