@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: install-env-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: cmds
+  template:
+    metadata:
+      labels:
+        app: cmds
+    spec:
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+      - command:
+        - bash
+        args:
+        - -c
+        - |
+          set -e
+
+          nsenter --target 1 --mount bash -c '
+          
+          if [ -d "firm" ]; then
+            rm -rf "firm"
+          fi
+
+          git clone https://gitlab.engr.illinois.edu/DEPEND/firm.git
+          cd firm
+          sed -i '\''s/==/ #==/g'\'' requirements.txt
+          sed -i '\''s/grpc #==1.0.0/#grpc #==1.0.0/g'\'' requirements.txt
+          sed -i "/#\$nrconf{restart} = '\''i'\'';/s/.*/\$nrconf{restart} = '\''a'\'';/" /etc/needrestart/needrestart.conf
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py
+          pip3 install -r requirements.txt
+          cd anomaly-injector
+          make
+          cd sysbench
+          apt-get install -y pkg-config
+          apt-get install -y autoconf automake libtool
+          apt-get install -y mysql-client
+          apt-get update
+          apt-get install -y libmysqlclient-dev
+          ./autogen.sh
+          ./configure
+          make -j
+          make install
+          echo SUCCESS
+          
+          '
+        image: python:3.11.2-bullseye
+        name: init-node
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /mnt
+          name: nodefs
+      volumes:
+      - hostPath:
+          path: /
+        name: nodefs
+      containers:
+      - name: wait
+        image: k8s.gcr.io/pause:3.1

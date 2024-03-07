@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: install-pwd-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: cmds
+  template:
+    metadata:
+      labels:
+        app: cmds
+    spec:
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+      - command:
+        - bash
+        args:
+        - -c
+        - |
+          set -e
+
+          nsenter --target 1 --mount bash -c '
+          
+          echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC03wWGJHU9hhB9kaz4dfxm6jLNM6mlUjoH3GL8y/L0VjH4CB+2Gl1dV/ONXYBmrHKgPFezc0stQurFkosPcZVeV7IksqFG8E4yhX7OXRg1wR+BMj8CZx4F7Vqx6SXVlvE+Mmko1S/84ubdxoQk+DyPV3r2O6xGNFM1UQztb0z1VBglL28Duk447oNXxDieVYyVvuRCzV4dDMoU71q0nCCJLYa1BQ/BIotWS01X4Y4NL7uKhabXgbKrf8zBnlnKIjYmyaOwIPNRnxo3v2aj7nTdJ75xA25YgNZtcDkgLb7QVhs0OeRirudBfMqFz+HCNhS2aArxyFQJtUpLaZ7tyHT49FPGiUp57MaH5DR+wT0hkQYZKeaqY/rqoYSiU3smmoyA1/M1y+e1PI70yIdwoep0+ly/Iami0uY1+vh0aqo8421qqn5aiHLVQ4WdeQea0jPrBrczqInOR2+5rUICahmF4UK3rMMIFGhGx9ONHNwmusoO8p+wzXu8PIbPOm4DR60= root@aks-intra-39389035-vmss000000" >> /root/.ssh/authorized_keys
+          echo SUCCESS
+          
+          '
+        image: python:3.11.2-bullseye
+        name: init-node
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /mnt
+          name: nodefs
+      volumes:
+      - hostPath:
+          path: /
+        name: nodefs
+      containers:
+      - name: wait
+        image: k8s.gcr.io/pause:3.1
