@@ -4,22 +4,36 @@ import subprocess
 import time
 
 # configure node IP addresses, username, network dev, and location of the performance anomaly injector here
-nodes = [
-        '2rbdv', '4fz2l', '6476q', '68jdm',
-        '6lrzk', 'bbjdc', 'bqjnx', 'dhhw9',
-        'dqp8z', 'dxxdd',
-        'htcd2', 'sz29g', 'v9f87', 'x4prz', 'z594x'
-]
+cmd = "kubectl get pods | grep intershell"
+output = subprocess.check_output(cmd, shell=True).decode("utf-8")
+
+nodes = []
+for line in output.splitlines():
+  nodes.append(line.split()[0].lstrip("intershell-"))
+
+print(len(nodes))
+print(nodes)
+
+# nodes = [
+#         '2rbdv', '4fz2l', '6476q', '68jdm',
+#         '6lrzk', 'bbjdc', 'bqjnx', 'dhhw9',
+#         'dqp8z', 'dxxdd',
+#         'htcd2', 'sz29g', 'v9f87', 'x4prz', 'z594x'
+# ]
 #username = 'ubuntu'
 #password = ''
-location = '/firm/anomaly-injector/'
+location = '/home/azureuser/firm/anomaly-injector/'
 threads = 1
-out = subprocess.Popen(['nproc'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-stdout, stderr = out.communicate()
-threads = int(stdout)
-dev = 'ib0' # eth0
+# try:
+#     out = subprocess.Popen(['nproc'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#     stdout, stderr = out.communicate()
+#     threads = int(stdout)
+# except Exception as e:
+#     threads = 4
 
-disk = 150   # file size: Gb
+dev = 'ib0' # eth0 # ERROR! cannot find device ib0
+
+disk = 30   # file size: Gb
 rate = 1024  # bandwidth limit: kbit
 limit = 1024 #
 latency = 50 # network delay: ms
@@ -74,22 +88,22 @@ def inject():
             #pswd = ''
             #if password != '':
             #    pswd = ':'+password
-            command = 'k exec -ti intershell-'+ nodes[i] +' -- bash -c \' set -e;    nsenter --target 1 --mount bash -c' + ' "cd ' + location + '; make; '
+            command = 'kubectl exec -ti intershell-'+ nodes[i] +' -- bash -c \' set -e;    nsenter --target 1 --mount bash -c' + ' "cd ' + location + '; make; '
             if anomaly_type == 0:
                 # cpu - ./cpu %d
-                command += commands[anomaly_type] % duration + '"' # (duration, cores, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, cores, intensity)
             elif anomaly_type == 1:
                 # memory - ./mem %d
-                command += commands[anomaly_type] % duration + '"' # (duration, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, intensity)
             elif anomaly_type == 2:
                 # llc - ./l3 %d
-                command += commands[anomaly_type] % duration + '"' # (duration, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, intensity)
             elif anomaly_type == 3:
                 # io - sysbench fileio --file-total-size=%dG --file-test-mode=rndrw --time=%d --threads=%d run
-                command += 'cd test-files; ' + commands[anomaly_type] % (disk, duration, threads) + '"' # (duration, threads, intensity)
+                command += 'cd test-files; ' + commands[anomaly_type] % (disk, duration, threads) + '" \'' # (duration, threads, intensity)
             elif anomaly_type == 4:
                 # network - tc
-                command += commands[anomaly_type] % ('add', dev, rate, burst) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, rate, burst) + '"'
+                command += commands[anomaly_type] % ('add', dev, rate, burst) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, rate, burst) + '" \''
             elif anomaly_type == 5:
                 # network delay - tc
                 command += commands[anomaly_type] % ('add', dev, latency, latency/10) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, latency, latency/10) + '" \''

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: install-anorminj-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: cmds
+  template:
+    metadata:
+      labels:
+        app: cmds
+    spec:
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+      - command:
+        - bash
+        args:
+        - -c
+        - |
+          set -e
+
+          nsenter --target 1 --mount bash -c '
+          
+          if [ -d "/home/azureuser/firm" ]; then
+              cd /home/azureuser/firm
+              git pull origin main
+              echo --UPDATED--
+          else
+              cd /home/azureuser
+              git clone https://github.com/YLAsce/firm.git
+              echo --CLONED--
+          fi
+          
+          cd /home/azureuser/firm
+          sed -i "/#\$nrconf{restart} = '\''i'\'';/s/.*/\$nrconf{restart} = '\''a'\'';/" /etc/needrestart/needrestart.conf
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py
+          pip3 install -r requirements.txt
+          cd anomaly-injector
+          make
+          cd sysbench
+          apt-get update
+          apt-get install -y pkg-config
+          apt-get install -y autoconf automake libtool
+          apt-get install -y mysql-client
+          apt-get install -y libmysqlclient-dev
+          ./autogen.sh
+          ./configure
+          make -j
+          make install
+
+          ##### These below should execute after setting up social network or not? 
+
+          cd ..
+          rm -rf test-files
+          mkdir test-files
+          cd test-files
+          sysbench fileio --file-total-size=30G prepare
+
+          echo SUCCESS
+          
+          '
+        image: python:3.11.2-bullseye
+        name: install-anorminj
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /mnt
+          name: nodefs
+      volumes:
+      - hostPath:
+          path: /
+        name: nodefs
+      containers:
+      - name: wait
+        image: k8s.gcr.io/pause:3.1

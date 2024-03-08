@@ -37,6 +37,6 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: yg397/social-network-microservices
+        image: yg397/social-network-microservices:root_cause
         command: ["UserService"]
       restartPolicy: Always

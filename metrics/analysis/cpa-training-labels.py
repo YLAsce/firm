@@ -5,26 +5,29 @@ import time
 import h5py
 
 # configure node IP addresses, username, network dev, and location of the performance anomaly injector here
-nodes = [
-        '6ct2n', '7986b', '7rff6', '88zkg',
-        'hknbg', 'hl2kg', 'jd4dq', 'mb2xv',
-        'ncwmm', 'pkllt',
-        'qp8wn', 'rklw2', 'szd4x', 'tsdmn', 'tspr7'
-]
+cmd = "kubectl get pods | grep intershell"
+output = subprocess.check_output(cmd, shell=True).decode("utf-8")
+
+nodes = []
+for line in output.splitlines():
+  nodes.append(line.split()[0].lstrip("intershell-"))
+
+print(len(nodes))
+print(nodes)
 #username = 'ubuntu'
 #password = ''
-location = '/firm/anomaly-injector/'
+location = '/home/azureuser/firm/anomaly-injector/'
 
 train_file_name = 'svm_train.h5'
 test_file_name = 'svm_test.h5'
 
 threads = 1
-out = subprocess.Popen(['nproc'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-stdout, stderr = out.communicate()
-threads = int(stdout)
+# out = subprocess.Popen(['nproc'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+# stdout, stderr = out.communicate()
+# threads = int(stdout)
 dev = 'ib0' # eth0
 
-disk = 150   # file size: Gb
+disk = 30   # file size: Gb
 rate = 1024  # bandwidth limit: kbit
 limit = 1024 #
 latency = 50 # network delay: ms

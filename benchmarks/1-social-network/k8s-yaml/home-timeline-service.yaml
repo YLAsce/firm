@@ -37,6 +37,6 @@ spec:
     spec:
       containers:
       - name: home-timeline-service
-        image: yg397/social-network-microservices
+        image: yg397/social-network-microservices:root_cause
         command: ["HomeTimelineService"]
       restartPolicy: Always

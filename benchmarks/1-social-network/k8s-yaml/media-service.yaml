@@ -37,6 +37,6 @@ spec:
     spec:
       containers:
       - name: media-service
-        image: yg397/social-network-microservices
+        image: yg397/social-network-microservices:root_cause
         command: ["MediaService"]
       restartPolicy: Always

@@ -39,6 +39,6 @@ spec:
     spec:
       containers:
       - name: compose-post-service
-        image: yg397/social-network-microservices
+        image: yg397/social-network-microservices:root_cause
         command: ["ComposePostService"]
       restartPolicy: Always
