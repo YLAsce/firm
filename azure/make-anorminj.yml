@@ -31,10 +31,10 @@ spec:
           cd anomaly-injector
           make
           cd sysbench
+          apt-get update
           apt-get install -y pkg-config
           apt-get install -y autoconf automake libtool
           apt-get install -y mysql-client
-          apt-get update
           apt-get install -y libmysqlclient-dev
           ./autogen.sh
           ./configure

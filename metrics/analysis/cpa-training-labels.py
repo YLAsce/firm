@@ -6,10 +6,10 @@ import h5py
 
 # configure node IP addresses, username, network dev, and location of the performance anomaly injector here
 nodes = [
-        '2rbdv', '4fz2l', '6476q', '68jdm',
-        '6lrzk', 'bbjdc', 'bqjnx', 'dhhw9',
-        'dqp8z', 'dxxdd',
-        'htcd2', 'sz29g', 'v9f87', 'x4prz', 'z594x'
+        '6ct2n', '7986b', '7rff6', '88zkg',
+        'hknbg', 'hl2kg', 'jd4dq', 'mb2xv',
+        'ncwmm', 'pkllt',
+        'qp8wn', 'rklw2', 'szd4x', 'tsdmn', 'tspr7'
 ]
 #username = 'ubuntu'
 #password = ''
@@ -86,28 +86,28 @@ def inject():
         
         for anomaly_type in types:
             intensity = random.randint(0, 100)
-            pswd = ''
-            if password != '':
-                pswd = ':'+password
-            command = 'ssh '+username+pswd+'@' + nodes[i] + ' "cd ' + location + '; '
+            #pswd = ''
+            #if password != '':
+            #    pswd = ':'+password
+            command = 'kubectl exec -ti intershell-'+ nodes[i] +' -- bash -c \' set -e;    nsenter --target 1 --mount bash -c' + ' "cd ' + location + '; make; '
             if anomaly_type == 0:
                 # cpu - ./cpu %d
-                command += commands[anomaly_type] % duration + '"' # (duration, cores, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, cores, intensity)
             elif anomaly_type == 1:
                 # memory - ./mem %d
-                command += commands[anomaly_type] % duration + '"' # (duration, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, intensity)
             elif anomaly_type == 2:
                 # llc - ./l3 %d
-                command += commands[anomaly_type] % duration + '"' # (duration, intensity)
+                command += commands[anomaly_type] % duration + '" \'' # (duration, intensity)
             elif anomaly_type == 3:
                 # io - sysbench fileio --file-total-size=%dG --file-test-mode=rndrw --time=%d --threads=%d run
-                command += 'cd test-files; ' + commands[anomaly_type] % (disk, duration, threads) + '"' # (duration, threads, intensity)
+                command += 'cd test-files; ' + commands[anomaly_type] % (disk, duration, threads) + '" \'' # (duration, threads, intensity)
             elif anomaly_type == 4:
                 # network - tc
-                command += commands[anomaly_type] % ('add', dev, rate, burst) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, rate, burst) + '"'
+                command += commands[anomaly_type] % ('add', dev, rate, burst) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, rate, burst) + '" \''
             elif anomaly_type == 5:
                 # network delay - tc
-                command += commands[anomaly_type] % ('add', dev, latency, latency/10) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, latency, latency/10) + '"'
+                command += commands[anomaly_type] % ('add', dev, latency, latency/10) + '; sleep ' + str(duration) + '; ' + commands[anomaly_type] % ('delete', dev, latency, latency/10) + '" \''
             print(command)
             os.system(command)
     return label

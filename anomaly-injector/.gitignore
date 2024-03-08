@@ -1,5 +1,5 @@
-cpu
-cpu-all-cores
-cpu-all-cores-with-affinity
-l3
-mem
+/cpu
+/cpu-all-cores
+/cpu-all-cores-with-affinity
+/l3
+/mem
