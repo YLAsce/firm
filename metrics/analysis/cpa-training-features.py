@@ -38,6 +38,7 @@ Require: Critical Path CP, Request Latencies T
 from neo4j import GraphDatabase
 import logging
 import h5py
+import time
 
 DATABASE = 'localhost:7687'
 USERNAME = 'neo4j'

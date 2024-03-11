@@ -131,3 +131,4 @@ if __name__=="__main__":
             test_h5.label[count - SIZE_TRAIN] = label
         time.sleep(interval)
         count += 1
+        print("============" + str(count) + "===========")
