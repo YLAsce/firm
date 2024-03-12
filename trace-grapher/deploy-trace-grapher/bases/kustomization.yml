@@ -13,5 +13,5 @@ bases:
   - jupyter
   - kafka-connect
 
-resources:
-  - gateway.yml
+# resources:
+  # - gateway.yml

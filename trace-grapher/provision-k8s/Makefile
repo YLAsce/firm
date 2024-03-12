@@ -41,7 +41,7 @@ _init/strimzi-operator-$(STRIMZI_VERSION):
 		"https://github.com/strimzi/strimzi-kafka-operator/releases/download/$(STRIMZI_VERSION)/strimzi-$(STRIMZI_VERSION).tar.gz" \
 	| tar --extract --gzip --directory="$@" --strip-components=1 --exclude=docs/
 	@echo "Changing namespace references in YAML files."
-	@sed -i 's/namespace: .*/namespace: $(STRIMZI_OPERATOR_NS)/' $@/install/cluster-operator/*RoleBinding*.yaml
+	@sed -i '' 's/namespace: .*/namespace: $(STRIMZI_OPERATOR_NS)/' $@/install/cluster-operator/*RoleBinding*.yaml
 	@yq delete --inplace \
 		'$@/install/cluster-operator/050-Deployment-strimzi-cluster-operator.yaml' \
 		'spec.template.spec.containers.(name==strimzi-cluster-operator).env.(name==STRIMZI_NAMESPACE).valueFrom'

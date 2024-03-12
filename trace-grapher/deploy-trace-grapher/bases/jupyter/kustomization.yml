@@ -22,4 +22,4 @@ configMapGenerator:
 resources:
   - service.yml
   - statefulset.yml
-  - virtualservice.yml
+  # - virtualservice.yml

@@ -46,13 +46,13 @@ spec:
           value: 0.0.0.0:7474
         - name: NEO4J_dbms_allow__upgrade
           value: 'true'
-        volumeMounts:
-        - name: data
-          mountPath: /data
-        - name: logs
-          mountPath: /logs
-        - name: plugins
-          mountPath: /plugins
+        # volumeMounts:
+        # - name: data
+        #   mountPath: /data
+        # - name: logs
+        #   mountPath: /logs
+        # - name: plugins
+        #   mountPath: /plugins
         readinessProbe:
           tcpSocket:
             port: 7687
@@ -72,9 +72,9 @@ spec:
       initContainers:
       - name: pull-plugins
         image: appropriate/curl:latest
-        volumeMounts:
-        - name: plugins
-          mountPath: /plugins
+        # volumeMounts:
+        # - name: plugins
+        #   mountPath: /plugins
         env:
         - name: HTTP_PROXY
           valueFrom:
@@ -95,32 +95,35 @@ spec:
         - "/bin/sh"
         - "-c"
         - |
+          mkdir /plugins
+          mkdir /logs
+          mkdir /data
           curl -x "${HTTP_PROXY}" -sSL https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.7/apoc-3.5.0.7-all.jar > "/plugins/apoc-3.5.0.7-all.jar";
-  volumeClaimTemplates:
-  - metadata:
-      name: "data"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 2Gi
-  - metadata:
-      name: "logs"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 1Gi
-  - metadata:
-      name: "plugins"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 1Gi
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: "data"
+  #   spec:
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     storageClassName: hostpath
+  #     resources:
+  #       requests:
+  #         storage: 2Gi
+  # - metadata:
+  #     name: "logs"
+  #   spec:
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     storageClassName: hostpath
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
+  # - metadata:
+  #     name: "plugins"
+  #   spec:
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     storageClassName: hostpath
+  #     resources:
+  #       requests:
+  #         storage: 1Gi

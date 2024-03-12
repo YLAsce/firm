@@ -2,7 +2,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: neo4j
+  name: neo4j-virtualsvc
 spec:
   hosts: [ "*" ]
   gateways:
@@ -15,7 +15,7 @@ spec:
         prefix: /db
     route:
     - destination:
-        host: neo4j
+        host: neo4j-svc
         port:
           number: 7474
   
@@ -24,6 +24,6 @@ spec:
     - port: 7687
     route:
     - destination:
-        host: neo4j
+        host: neo4j-svc
         port:
           number: 7687

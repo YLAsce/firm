@@ -53,3 +53,4 @@ data:
       name: "kafka_connect_connect_worker_metrics_$1"
     - pattern: "kafka.connect<type=connect-metrics, client-id=([^:]+)><>([^:]+)"
       name: "kafka_connect_connect_metrics_$1_$2"
+

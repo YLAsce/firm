@@ -4,7 +4,7 @@ kind: Kustomization
 secretGenerator:
   - name: neo4j-env
     literals:
-      - NEO4J_AUTH=GorgeousPassword
+      - NEO4J_AUTH=neo4j/GorgeousPassword
       - HTTP_PROXY=
       - HTTPS_PROXY=
       - NO_PROXY=localhost,127.0.0.1
@@ -12,4 +12,4 @@ secretGenerator:
 resources:
   - service.yml
   - statefulset.yml
-  - virtualservice.yml
+  # - virtualservice.yml
